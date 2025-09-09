@@ -97,4 +97,3 @@ main = do
     putStrLn $ "applyTwice double 2: " ++ show (applyTwice double 2)
     putStrLn $ "applyTwice increment 5: " ++ show (applyTwice increment 5)
     
-    putStrLn "\n=== All tasks completed! ==="
