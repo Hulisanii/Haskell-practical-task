@@ -1,3 +1,4 @@
+------by Hulisani Muravha 
 -- HC2T1 – Tuple with different types
 sampleData :: (Int, Double, String, Char, Bool)
 sampleData = (42, 3.14, "Haskell", 'X', True && False)
