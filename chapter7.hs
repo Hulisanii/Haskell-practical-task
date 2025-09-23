@@ -1,4 +1,5 @@
--- HC7T1: Eq Instance for Color
+----by Hulisani Muravha
+----HC7T1 
 data Color = Red | Green | Blue
 
 instance Eq Color where
