@@ -1,3 +1,4 @@
+----By Hulisani Muravha 
 import Data.List (sortOn)
 
 -- HC1T1 - Task 1: Function Composition
