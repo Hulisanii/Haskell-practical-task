@@ -1,136 +1,55 @@
-----by Hulisani Muravha
-----HC7T1 
-data Color = Red | Green | Blue
+---by Hulisani Muravha 
+-- 1. sumList: recursive sum
+sumList :: Num a => [a] -> a
+sumList []     = 0
+sumList (x:xs) = x + sumList xs
 
-instance Eq Color where
-    Red == Red = True
-    Green == Green = True
-    Blue == Blue = True
-    _ == _ = False
+-- 2. productList: recursive product
+productList :: Num a => [a] -> a
+productList []     = 1
+productList (x:xs) = x * productList xs
 
--- HC7T2: Ord Instance for Color
-instance Ord Color where
-    compare Red Red = EQ
-    compare Green Green = EQ
-    compare Blue Blue = EQ
-    compare Red _ = LT
-    compare Green Red = GT
-    compare Green Blue = LT
-    compare Blue _ = GT
+-- 3. myLength: recursive length
+myLength :: [a] -> Int
+myLength []     = 0
+myLength (_:xs) = 1 + myLength xs
 
--- HC7T3: Function with Eq and Ord Constraints
-compareValues :: (Eq a, Ord a) => a -> a -> a
-compareValues x y
-    | x > y     = x
-    | otherwise = y
+-- 4. myReverse: naive recursive reverse
+myReverse :: [a] -> [a]
+myReverse []     = []
+myReverse (x:xs) = myReverse xs ++ [x]
 
--- HC7T4: Shape with Show and Read Instances
-data Shape = Circle Double | Rectangle Double Double
+-- 5. takeWhile' : implementation using recursion
+takeWhile' :: (a -> Bool) -> [a] -> [a]
+takeWhile' _ [] = []
+takeWhile' p (x:xs)
+  | p x       = x : takeWhile' p xs
+  | otherwise = []
 
-instance Show Shape where
-    show (Circle r) = "Circle " ++ show r
-    show (Rectangle w h) = "Rectangle " ++ show w ++ " " ++ show h
+-- 6. quickSort (recursive example)
+quickSort :: (Ord a) => [a] -> [a]
+quickSort []     = []
+quickSort (p:xs) = quickSort smaller ++ [p] ++ quickSort larger
+  where
+    smaller = [x | x <- xs, x <= p]
+    larger  = [x | x <- xs, x > p]
 
-instance Read Shape where
-    readsPrec _ input =
-        case words input of
-            ["Circle", r] -> [(Circle (read r), "")]
-            ["Rectangle", w, h] -> [(Rectangle (read w) (read h), "")]
-            _ -> []
+-- 7. tails (generate list of suffixes)
+tails' :: [a] -> [[a]]
+tails' [] = [[]]
+tails' xs@(_:xs') = xs : tails' xs'
 
--- HC7T5: Function with Num Constraint
-squareArea :: Num a => a -> a
-squareArea side = side * side
-
--- HC7T6: Circle Circumference with Integral and Floating
-circleCircumference :: Floating a => a -> a
-circleCircumference radius = 2 * pi * radius
-
-circleCircumferenceInt :: Integral a => a -> Double
-circleCircumferenceInt radius = 2 * pi * fromIntegral radius
-
--- HC7T7: Bounded and Enum for Color
-instance Bounded Color where
-    minBound = Red
-    maxBound = Blue
-
-instance Enum Color where
-    fromEnum Red = 0
-    fromEnum Green = 1
-    fromEnum Blue = 2
-    
-    toEnum 0 = Red
-    toEnum 1 = Green
-    toEnum 2 = Blue
-    toEnum _ = error "Color.toEnum: invalid value"
-
-nextColor :: Color -> Color
-nextColor color
-    | color == maxBound = minBound
-    | otherwise = succ color
-
--- HC7T8: Parse Shape from String
-parseShape :: String -> Maybe Shape
-parseShape input = case reads input of
-    [(shape, "")] -> Just shape
-    _ -> Nothing
-
--- HC7T9: Describable Type Class
-class Describable a where
-    describe :: a -> String
-
-instance Describable Bool where
-    describe True = "This is true"
-    describe False = "This is false"
-
-instance Describable Shape where
-    describe (Circle r) = "A circle with radius " ++ show r
-    describe (Rectangle w h) = "A rectangle with width " ++ show w ++ " and height " ++ show h
-
--- HC7T10: Function with Multiple Type Class Constraints
-describeAndCompare :: (Describable a, Ord a) => a -> a -> String
-describeAndCompare x y
-    | x > y     = describe x
-    | otherwise = describe y
-
--- Main function to test everything
+-- A simple main that demonstrates the functions:
 main :: IO ()
 main = do
-    putStrLn "=== Testing Color Type ==="
-    print $ Red == Green  -- Should be False
-    print $ Red < Green   -- Should be True
-    print $ compareValues Red Blue  -- Should be Blue
-    
-    putStrLn "\n=== Testing nextColor ==="
-    print $ nextColor Red    -- Should be Green
-    print $ nextColor Green  -- Should be Blue
-    print $ nextColor Blue   -- Should be Red (wrap around)
-    
-    putStrLn "\n=== Testing Shape Type ==="
-    let circle = Circle 5.0
-    let rect = Rectangle 4.0 6.0
-    print circle
-    print rect
-    
-    putStrLn "\n=== Testing parseShape ==="
-    print $ parseShape "Circle 5.0"
-    print $ parseShape "Rectangle 3.0 4.0"
-    print $ parseShape "Invalid"
-    
-    putStrLn "\n=== Testing Describable ==="
-    putStrLn $ describe True
-    putStrLn $ describe False
-    putStrLn $ describe circle
-    putStrLn $ describe rect
-    
-    putStrLn "\n=== Testing Math Functions ==="
-    print $ squareArea (5 :: Int)
-    print $ squareArea (5.0 :: Double)
-    print $ circleCircumference (5.0 :: Double)
-    print $ circleCircumferenceInt (5 :: Int)
-    
-    putStrLn "\n=== Testing describeAndCompare ==="
-    putStrLn $ describeAndCompare (Circle 3.0) (Circle 5.0)
-    putStrLn $ describeAndCompare (Rectangle 2.0 3.0) (Rectangle 1.0 4.0)
-    
-    putStrLn "All tests completed!"
+  -- do: starts a sequence of IO actions
+  let lst = [5,2,9,1,7,3] -- let: local binding for pure code
+  putStrLn "Chapter 7: Lists & Recursion demo"
+  putStrLn $ "list: " ++ show lst
+  putStrLn $ "sumList: " ++ show (sumList lst)
+  putStrLn $ "productList: " ++ show (productList lst)
+  putStrLn $ "myLength: " ++ show (myLength lst)
+  putStrLn $ "myReverse: " ++ show (myReverse lst)
+  putStrLn $ "takeWhile (<5): " ++ show (takeWhile' (<5) lst)
+  putStrLn $ "quickSort: " ++ show (quickSort lst)
+  putStrLn $ "tails: " ++ show (tails' lst)
