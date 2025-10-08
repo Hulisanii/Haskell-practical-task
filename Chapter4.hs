@@ -1,73 +1,149 @@
-----by Hulisani Muravha 
+
+---By: Hulisani Muravha
+--HC4T1 to HC4T8 Solutions
+
 module Main where
+-- HC4T1 - Task 1: Define a weatherReport Function
 
--- TASK 1: map using foldr
-mapFoldr :: (a -> b) -> [a] -> [b]
-mapFoldr f = foldr (\x acc -> f x : acc) []
+weatherReport :: String -> String
+weatherReport "sunny"  = "It's a bright and beautiful day!"
+weatherReport "rainy"  = "Don't forget your umbrella!"
+weatherReport "cloudy" = "A bit gloomy, but no rain yet!"
+weatherReport _        = "Weather unknown"
 
--- TASK 2: filter using foldr
-filterFoldr :: (a -> Bool) -> [a] -> [a]
-filterFoldr p = foldr (\x acc -> if p x then x:acc else acc) []
+-- HC4T2 - Task 2: Define a dayType Function  
+-- Description: Determines if a day is weekday or weekend using pattern matching
 
--- TASK 3: foldl implementation (explicit, left fold)
-myFoldl :: (b -> a -> b) -> b -> [a] -> b
-myFoldl _ acc []     = acc
-myFoldl f acc (x:xs) = myFoldl f (f acc x) xs
+dayType :: String -> String
+dayType "Saturday" = "It's a weekend!"
+dayType "Sunday"   = "It's a weekend!"
+dayType "Monday"   = "It's a weekday."
+dayType "Tuesday"  = "It's a weekday."
+dayType "Wednesday"= "It's a weekday."
+dayType "Thursday" = "It's a weekday."
+dayType "Friday"   = "It's a weekday."
+dayType _          = "Invalid day"
 
--- TASK 4: quicksort using filter (higher-order style)
-quicksort :: Ord a => [a] -> [a]
-quicksort []     = []
-quicksort (p:xs) =
-  let left  = filter (< p) xs
-      right = filter (>= p) xs
-  in quicksort left ++ [p] ++ quicksort right
 
--- TASK 5: function composition example (apply two functions)
-composeExample :: (b -> c) -> (a -> b) -> a -> c
-composeExample f g = f . g
+-- HC4T3 - Task 3: Define a gradeComment Function
+-- Description: Returns comment based on grade range using pattern matching
+gradeComment :: Int -> String
+gradeComment grade
+  | grade >= 90 && grade <= 100 = "Excellent!"
+  | grade >= 70 && grade <= 89  = "Good job!"
+  | grade >= 50 && grade <= 69  = "You passed."
+  | grade >= 0  && grade <= 49  = "Better luck next time."
+  | otherwise                   = "Invalid grade"
 
--- TASK 6: curry and uncurry
-myCurry :: ((a, b) -> c) -> a -> b -> c
-myCurry f a b = f (a, b)
 
-myUncurry :: (a -> b -> c) -> (a, b) -> c
-myUncurry f (a, b) = f a b
+-- HC4T4 - Task 4: Rewrite specialBirthday using Pattern Matching
 
--- TASK 7: applyN (apply a function n times)
-applyN :: Int -> (a -> a) -> a -> a
-applyN n f x
-  | n <= 0    = x
-  | otherwise = applyN (n - 1) f (f x)
+specialBirthday :: Int -> String
+specialBirthday 1  = "First birthday! How exciting!"
+specialBirthday 16 = "Sweet sixteen!"
+specialBirthday 18 = "You're an adult now!"
+specialBirthday 21 = "Legal drinking age in some countries!"
+specialBirthday 50 = "Half a century!"
+specialBirthday _  = "Just another birthday."
 
--- TASK 8: zipWith' (re-implement)
-zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
-zipWith' _ [] _ = []
-zipWith' _ _ [] = []
-zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys
+-- HC4T5 - Task 5: Add a Catch-All Pattern with a Custom Message
 
--- TASK 9: iterate' (produce infinite list by repeatedly applying f)
-iterate' :: (a -> a) -> a -> [a]
-iterate' f x = x : iterate' f (f x)
+specialBirthdayV2 :: Int -> String
+specialBirthdayV2 1  = "First birthday! How exciting!"
+specialBirthdayV2 16 = "Sweet sixteen!"
+specialBirthdayV2 18 = "You're an adult now!"
+specialBirthdayV2 21 = "Legal drinking age in some countries!"
+specialBirthdayV2 50 = "Half a century!"
+specialBirthdayV2 age = "Happy " ++ show age ++ "th birthday!"
 
--- TASK 10: all/any using folds
-allFold :: (a -> Bool) -> [a] -> Bool
-allFold p = foldr (\x acc -> p x && acc) True
+-- HC4T6 - Task 6: Identify List Contents Using Pattern Matching
 
-anyFold :: (a -> Bool) -> [a] -> Bool
-anyFold p = foldr (\x acc -> p x || acc) False
+whatsInsideThisList :: [a] -> String
+whatsInsideThisList []     = "This list is empty"
+whatsInsideThisList [_]    = "This list has exactly one element"
+whatsInsideThisList [_,_]  = "This list has exactly two elements" 
+whatsInsideThisList [_,_,_]= "This list has exactly three elements"
+whatsInsideThisList _      = "This list has more than three elements"
 
--- Demo main
+
+-- HC4T7 - Task 7: Ignore Elements in a List
+-- Description: Returns only first and third elements, ignoring others
+
+firstAndThirdSafe :: [a] -> Maybe (a, a)
+firstAndThirdSafe (x:_:z:_) = Just (x, z)
+firstAndThirdSafe _          = Nothing
+
+
+-- HC4T8 - Task 8: Extract Values from Tuples
+
+describeTuple :: (String, Int, Bool) -> String
+describeTuple (name, age, isStudent) =
+  "Name: " ++ name ++ ", Age: " ++ show age ++ ", Student: " ++ show isStudent
+
+describePair :: (String, String) -> String
+describePair (first, second) =
+  "First: " ++ first ++ ", Second: " ++ second
+
+-- DEMONSTRATION AND TESTING
 main :: IO ()
 main = do
-  putStrLn "Chapter 4 demos:"
-  putStrLn $ "mapFoldr (*2) [1,2,3] = " ++ show (mapFoldr (*2) [1,2,3 :: Int])
-  putStrLn $ "filterFoldr even [1..6] = " ++ show (filterFoldr even [1..6 :: Int])
-  putStrLn $ "myFoldl (+) 0 [1..5] = " ++ show (myFoldl (+) 0 [1..5 :: Int])
-  putStrLn $ "quicksort [3,1,4,1,5,9] = " ++ show (quicksort [3,1,4,1,5,9 :: Int])
-  putStrLn $ "composeExample (show . (+1)) 5 = " ++ show ((composeExample show (+1)) 5)
-  putStrLn $ "myCurry fstPair 3 4 = " ++ show ((myCurry (\(a,b) -> a + b) 3 4) :: Int)
-  putStrLn $ "applyN 3 (+2) 0 = " ++ show (applyN 3 (+2) 0)
-  putStrLn $ "zipWith' (*) [1,2] [3,4] = " ++ show (zipWith' (*) [1,2 :: Int] [3,4 :: Int])
-  putStrLn $ "take 5 of iterate' (*2) 1 = " ++ show (take 5 (iterate' (*2) 1 :: [Int]))
-  putStrLn $ "allFold (>0) [1,2,3] = " ++ show (allFold (>0) [1,2,3 :: Int]) ++
-             ", anyFold (==2) [1,2,3] = " ++ show (anyFold (==2) [1,2,3 :: Int])
+  putStrLn "=== Haskell Pattern Matching Tasks ==="
+  putStrLn "By: Hulisani Muravha"
+  putStrLn ""
+  
+  putStrLn "HC4T1: Weather Report"
+  putStrLn $ "  sunny:  " ++ weatherReport "sunny"
+  putStrLn $ "  rainy:  " ++ weatherReport "rainy" 
+  putStrLn $ "  cloudy: " ++ weatherReport "cloudy"
+  putStrLn $ "  snowy:  " ++ weatherReport "snowy"
+  putStrLn ""
+  
+  putStrLn "HC4T2: Day Type"
+  putStrLn $ "  Saturday: " ++ dayType "Saturday"
+  putStrLn $ "  Monday:   " ++ dayType "Monday"
+  putStrLn $ "  Funday:   " ++ dayType "Funday"
+  putStrLn ""
+  
+  putStrLn "HC4T3: Grade Comment"
+  putStrLn $ "  95: " ++ gradeComment 95
+  putStrLn $ "  75: " ++ gradeComment 75
+  putStrLn $ "  55: " ++ gradeComment 55
+  putStrLn $ "  35: " ++ gradeComment 35
+  putStrLn $ "  -5: " ++ gradeComment (-5)
+  putStrLn ""
+  
+  putStrLn "HC4T4: Special Birthday (Pattern Matching)"
+  putStrLn $ "  1:  " ++ specialBirthday 1
+  putStrLn $ "  16: " ++ specialBirthday 16
+  putStrLn $ "  21: " ++ specialBirthday 21
+  putStrLn $ "  25: " ++ specialBirthday 25
+  putStrLn ""
+  
+  putStrLn "HC4T5: Special Birthday V2 (With Age in Message)"
+  putStrLn $ "  1:  " ++ specialBirthdayV2 1
+  putStrLn $ "  16: " ++ specialBirthdayV2 16
+  putStrLn $ "  25: " ++ specialBirthdayV2 25
+  putStrLn $ "  30: " ++ specialBirthdayV2 30
+  putStrLn ""
+  
+  putStrLn "HC4T6: What's Inside This List?"
+  putStrLn $ "  []:          " ++ whatsInsideThisList ([] :: [Int])
+  putStrLn $ "  [1]:         " ++ whatsInsideThisList [1]
+  putStrLn $ "  [1,2]:       " ++ whatsInsideThisList [1,2]
+  putStrLn $ "  [1,2,3]:     " ++ whatsInsideThisList [1,2,3]
+  putStrLn $ "  [1,2,3,4]:   " ++ whatsInsideThisList [1,2,3,4]
+  putStrLn ""
+  
+  putStrLn "HC4T7: First and Third Elements"
+  putStrLn $ "  [1,2,3,4,5]: " ++ show (firstAndThirdSafe [1,2,3,4,5])
+  putStrLn $ "  [10,20,30]:  " ++ show (firstAndThirdSafe [10,20,30])
+  putStrLn $ "  [1,2]:       " ++ show (firstAndThirdSafe [1,2])
+  putStrLn ""
+  
+  putStrLn "HC4T8: Describe Tuple"
+  putStrLn $ "  Tuple 1: " ++ describeTuple ("Alice", 20, True)
+  putStrLn $ "  Tuple 2: " ++ describeTuple ("Bob", 25, False)
+  putStrLn $ "  Pair:    " ++ describePair ("Hello", "World")
+  putStrLn ""
+  
+  putStrLn "=== All Pattern Matching Tasks Completed! ==="
