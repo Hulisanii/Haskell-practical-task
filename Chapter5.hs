@@ -1,74 +1,105 @@
------by Hulisani Muravha
+--- By: Hulisani Muravha
+-- HC5T1 to HC5T10 Solutions
+
 module Main where
 
--- TASK 1: define a binary tree type
-data Tree a = Empty | Node a (Tree a) (Tree a) deriving (Show, Eq)
+-- HC5T1 - Using applyTwice
+-- Define a function that takes a function and an integer, then applies the function three times
+applyThrice :: (Int -> Int) -> Int -> Int
+applyThrice f x = f (f (f x))
 
--- TASK 2: insert into a binary search tree
-insertBST :: Ord a => a -> Tree a -> Tree a
-insertBST x Empty = Node x Empty Empty
-insertBST x (Node y left right)
-  | x == y = Node y left right
-  | x < y  = Node y (insertBST x left) right
-  | x > y  = Node y left (insertBST x right)
+-- HC5T2 - Filtering Odd Numbers
+-- Use the filter function to extract all odd numbers from 1 to 30
+oddNumbers :: [Int]
+oddNumbers = filter odd [1..30]
 
--- TASK 3: build tree from list
-fromList :: Ord a => [a] -> Tree a
-fromList = foldr insertBST Empty
+-- HC5T3 - Checking for Uppercase Letters
+-- Use any to check if any word starts with an uppercase letter
+hasUppercaseWord :: [String] -> Bool
+hasUppercaseWord = any (\word -> not (null word) && head word `elem` ['A'..'Z'])
 
--- TASK 4: treeMap (map over values in tree)
-treeMap :: (a -> b) -> Tree a -> Tree b
-treeMap _ Empty = Empty
-treeMap f (Node x l r) = Node (f x) (treeMap f l) (treeMap f r)
+-- HC5T4 - Using Lambda Functions
+-- Rewrite biggerThan10 using a lambda function
+biggerThan10 :: Int -> Bool
+biggerThan10 = (\x -> x > 10)
 
--- TASK 5: treeFold (inorder fold)
-treeFold :: (b -> a -> b) -> b -> Tree a -> b
-treeFold _ acc Empty = acc
-treeFold f acc (Node x l r) =
-  let accL = treeFold f acc l
-      accM = f accL x
-  in treeFold f accM r
+-- HC5T5 - Partial Application
+-- Create a function multiplyByFive that multiplies any number by 5
+multiplyByFive :: Int -> Int
+multiplyByFive = (*5)
 
--- TASK 6: treeToList (inorder)
-treeToList :: Tree a -> [a]
-treeToList = treeFold (\acc x -> acc ++ [x]) []
+-- HC5T6 - Function Composition
+-- Create a function that returns squares filtered to only keep the even ones
+evenSquares :: [Int] -> [Int]
+evenSquares = filter even . map (^2)
 
--- TASK 7: Maybe usage: safeHead
-safeHead :: [a] -> Maybe a
-safeHead []    = Nothing
-safeHead (x:_) = Just x
+-- HC5T7 - The $ Operator
+-- Rewrite using the $ operator for cleaner code
+result :: Int
+result = sum $ map (*2) $ filter (>3) [1..10]
 
--- TASK 8: Either usage: safeDiv
-safeDiv :: (Eq a, Fractional a) => a -> a -> Either String a
-safeDiv _ 0 = Left "Division by zero"
-safeDiv a b = Right (a / b)
+-- HC5T8 - Point-Free Style
+-- Convert addFive to point-free style
+addFive :: Int -> Int
+addFive = (+5)
 
--- TASK 9: Expression AST and evaluator
-data Expr = Const Int | Add Expr Expr | Mul Expr Expr deriving (Show, Eq)
+-- HC5T9 - Higher-Order Function to Transform a List
+-- Applies a given function twice to every element of a list
+transformList :: (a -> a) -> [a] -> [a]
+transformList f = map (f . f)
 
-eval :: Expr -> Int
-eval (Const n)   = n
-eval (Add a b)   = eval a + eval b
-eval (Mul a b)   = eval a * eval b
+-- HC5T10 - Combining Higher-Order Functions
+-- Checks if any squared value in a list is greater than 50
+hasLargeSquare :: [Int] -> Bool
+hasLargeSquare = any (>50) . map (^2)
 
--- TASK 10: prettyPrint expression (simple)
-pretty :: Expr -> String
-pretty (Const n) = show n
-pretty (Add a b) = "(" ++ pretty a ++ " + " ++ pretty b ++ ")"
-pretty (Mul a b) = "(" ++ pretty a ++ " * " ++ pretty b ++ ")"
-
--- Demo main
+-- DEMONSTRATION AND TESTING
 main :: IO ()
 main = do
-  putStrLn "Chapter 5 demos:"
-  let nums = [7,3,9,1,5]
-  let tree = fromList nums
-  putStrLn $ "fromList " ++ show nums ++ " -> tree: " ++ show tree
-  putStrLn $ "treeToList (inorder) = " ++ show (treeToList tree)
-  putStrLn $ "treeMap (*2) tree -> " ++ show (treeMap (*2) tree)
-  putStrLn $ "safeHead [] = " ++ show (safeHead ([] :: [Int]))
-  putStrLn $ "safeHead [10,20] = " ++ show (safeHead [10,20 :: Int])
-  putStrLn $ "safeDiv 10 2 = " ++ show (safeDiv 10 2 :: Either String Double)
-  putStrLn $ "safeDiv 1 0 = " ++ show (safeDiv 1 0 :: Either String Double)
-  let expr = Add (Const 2) (Mul (Const 3) (Const 4)) -- 2 + 3*4
-  putStrLn $ "expr pretty = " ++ pretty expr ++ ", eval = " ++ show (eval expr)
+  putStrLn "HC5T1:"
+  print (applyThrice (+1) 5)
+  print (applyThrice (*2) 2)
+  putStrLn ""
+
+  putStrLn "HC5T2:"
+  print oddNumbers
+  putStrLn ""
+
+  putStrLn "HC5T3:"
+  print (hasUppercaseWord ["apple", "Banana", "cherry"])
+  print (hasUppercaseWord ["dog", "cat", "fish"])
+  putStrLn ""
+
+  putStrLn "HC5T4:"
+  print (biggerThan10 5)
+  print (biggerThan10 15)
+  putStrLn ""
+
+  putStrLn "HC5T5:"
+  print (multiplyByFive 3)
+  print (multiplyByFive 10)
+  putStrLn ""
+
+  putStrLn "HC5T6:"
+  print (evenSquares [1..10])
+  putStrLn ""
+
+  putStrLn "HC5T7:"
+  print result
+  putStrLn ""
+
+  putStrLn "HC5T8:"
+  print (addFive 7)
+  print (addFive 20)
+  putStrLn ""
+
+  putStrLn "HC5T9:"
+  print (transformList (+1) [1,2,3])
+  print (transformList (*2) [1,2,3])
+  putStrLn ""
+
+  putStrLn "HC5T10:"
+  print (hasLargeSquare [3,5,6])
+  print (hasLargeSquare [2,4,5])
+  putStrLn ""
+
