@@ -127,7 +127,7 @@ main = do
     putStrLn "\nAll tasks demonstrated. Program complete."
 
 
-
+MathOperations
 -- By Hulisani Muravha
 -- HC12T10: Mathematical Operations Module
 
