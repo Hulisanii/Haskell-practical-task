@@ -1,195 +1,149 @@
-
 -- By Hulisani Muravha
--- Chapter12Programs.hs
--- Haskell Chapter 12 Practical Tasks (HC12T1–HC12T10)
+module Main where
 
-import Data.List (sort)
+-- HC12T1 to HC12T10
+-- A single file demonstrating all tasks HC12T1..HC12T10
+
 import System.IO
+import System.Directory (doesFileExist)
+import Control.Exception (catch, IOException)
+import Data.Char (toLower)
+import qualified MathOperations as MathOps
 
-------------------------------------------------------------
 -- HC12T1: Print a Welcome Message
-------------------------------------------------------------
-main1 :: IO ()
-main1 = putStrLn "Welcome to Haskell Programming!"
+printWelcome :: IO ()
+printWelcome = putStrLn "Welcome to Haskell Programming!"
 
-------------------------------------------------------------
 -- HC12T2: Add Two Numbers
-------------------------------------------------------------
 addTwoNumbers :: Int -> Int -> Int
 addTwoNumbers x y = x + y
 
-main2 :: IO ()
-main2 = do
-    let result = addTwoNumbers 5 3
-    putStrLn $ "Sum: " ++ show result
-
-------------------------------------------------------------
--- HC12T3: Factorial Function
-------------------------------------------------------------
-factorial :: Integer -> Integer
+-- HC12T3: Factorial Function (recursive)
+factorial :: Int -> Int
 factorial 0 = 1
-factorial n = n * factorial (n - 1)
+factorial n
+    | n < 0     = error "factorial: negative input"
+    | otherwise = n * factorial (n - 1)
 
-main3 :: IO ()
-main3 = do
-    putStrLn "Enter a number for factorial:"
-    input <- getLine
-    let n = read input :: Integer
-    putStrLn $ "Factorial of " ++ show n ++ " is " ++ show (factorial n)
-
-------------------------------------------------------------
--- HC12T4: First 10 Fibonacci Numbers
-------------------------------------------------------------
-fibonacci :: Int -> Integer
+-- HC12T4: First 10 Fibonacci Numbers (recursive)
+fibonacci :: Int -> Int
 fibonacci 0 = 0
 fibonacci 1 = 1
-fibonacci n = fibonacci (n-1) + fibonacci (n-2)
+fibonacci n = fibonacci (n - 1) + fibonacci (n - 2)
 
-main4 :: IO ()
-main4 = do
-    let fibs = map fibonacci [0..9]
-    putStrLn "First 10 Fibonacci numbers:"
-    mapM_ (putStrLn . show) fibs
+firstTenFibonacci :: [Int]
+firstTenFibonacci = [fibonacci n | n <- [0..9]]
 
-------------------------------------------------------------
--- HC12T5: Palindrome Checker
-------------------------------------------------------------
+-- HC12T5: Palindrome Checker (uses user input in main)
 isPalindrome :: String -> Bool
-isPalindrome str = str == reverse str
+isPalindrome str =
+    let cleaned = map toLower (filter (/= ' ') str)
+    in cleaned == reverse cleaned
 
-main5 :: IO ()
-main5 = do
-    putStrLn "Enter a string to check for palindrome:"
-    input <- getLine
-    if isPalindrome input
-        then putStrLn "It's a palindrome!"
-        else putStrLn "It's not a palindrome."
+-- HC12T6: Sort a List of Integers (quick sort)
+sortList :: [Int] -> [Int]
+sortList []     = []
+sortList (p:xs) = sortList lesser ++ [p] ++ sortList greater
+  where
+    lesser  = [x | x <- xs, x <= p]
+    greater = [x | x <- xs, x >  p]
 
-------------------------------------------------------------
--- HC12T6: Sort a List of Integers
-------------------------------------------------------------
-main6 :: IO ()
-main6 = do
-    putStrLn "Enter integers separated by spaces:"
-    input <- getLine
-    let numbers = map read (words input) :: [Int]
-    let sorted = sort numbers
-    putStrLn $ "Sorted list: " ++ show sorted
-
-------------------------------------------------------------
 -- HC12T7: Calculate Circle Area
-------------------------------------------------------------
-calculateCircleArea :: Double -> Double
-calculateCircleArea radius = pi * radius * radius
+calculateCircleArea :: Floating a => a -> a
+calculateCircleArea r
+    | r < 0     = error "Radius cannot be negative"
+    | otherwise = pi * r * r
 
-main7 :: IO ()
-main7 = do
-    putStrLn "Enter circle radius:"
-    input <- getLine
-    let radius = read input :: Double
-    putStrLn $ "Area: " ++ show (calculateCircleArea radius)
-
-------------------------------------------------------------
 -- HC12T8: Merge Two Sorted Lists
-------------------------------------------------------------
 mergeLists :: Ord a => [a] -> [a] -> [a]
-mergeLists [] ys = ys
 mergeLists xs [] = xs
+mergeLists [] ys = ys
 mergeLists (x:xs) (y:ys)
     | x <= y    = x : mergeLists xs (y:ys)
     | otherwise = y : mergeLists (x:xs) ys
 
-main8 :: IO ()
-main8 = do
-    let list1 = [1,3,5,7]
-    let list2 = [2,4,6,8]
-    let merged = mergeLists list1 list2
-    putStrLn $ "List 1: " ++ show list1
-    putStrLn $ "List 2: " ++ show list2
-    putStrLn $ "Merged: " ++ show merged
-
-------------------------------------------------------------
--- HC12T9: Read and Print File Content
-------------------------------------------------------------
-main9 :: IO ()
-main9 = do
-    putStrLn "Enter filename:"
-    filename <- getLine
-    result <- tryReadFile filename
-    case result of
-        Right content -> do
-            putStrLn "File content:"
-            putStrLn content
-        Left errorMsg -> putStrLn errorMsg
+-- HC12T9: Read and Print File Content (graceful error handling)
+readAndPrintFile :: FilePath -> IO ()
+readAndPrintFile path = do
+    exists <- doesFileExist path
+    if exists
+      then do
+        -- catch any IO exception while reading and print a message
+        content <- readFile path `catch` handler
+        putStrLn "----- File Content -----"
+        putStrLn content
+      else putStrLn ("Error: File does not exist: " ++ path)
   where
-    tryReadFile :: String -> IO (Either String String)
-    tryReadFile fname = do
-        exists <- doesFileExist fname
-        if exists
-            then fmap Right (readFile fname)
-            else return (Left "File does not exist")
-    
-    doesFileExist :: String -> IO Bool
-    doesFileExist fname = do
-        result <- try (readFile fname) :: IO (Either IOException String)
-        return $ case result of
-            Left _ -> False
-            Right _ -> True
+    handler :: IOException -> IO String
+    handler e = return ("Error reading file: " ++ show e)
 
-------------------------------------------------------------
--- HC12T10: Mathematical Operations Module
-------------------------------------------------------------
--- This would typically be in a separate file MathOperations.hs
--- but for simplicity, we'll define it here
+-- HC12T10: Mathematical Operations Module (see MathOperations.hs)
 
-module MathOperations where
-
-add :: Num a => a -> a -> a
-add = (+)
-
-multiply :: Num a => a -> a -> a
-multiply = (*)
-
-power :: (Integral b) => a -> b -> a
-power x n = product (replicate n x)
-
-isPrime :: Int -> Bool
-isPrime n
-    | n <= 1 = False
-    | otherwise = null [x | x <- [2..floor (sqrt (fromIntegral n))], n `mod` x == 0]
-
--- Main function to demonstrate the module
-main10 :: IO ()
-main10 = do
-    putStrLn "Math Operations Demo:"
-    putStrLn $ "5 + 3 = " ++ show (MathOperations.add 5 3)
-    putStrLn $ "5 * 3 = " ++ show (MathOperations.multiply 5 3)
-    putStrLn $ "2 ^ 4 = " ++ show (MathOperations.power (2::Int) 4)
-    putStrLn $ "Is 17 prime? " ++ show (MathOperations.isPrime 17)
-
-------------------------------------------------------------
--- Run all examples
-------------------------------------------------------------
+-- MAIN FUNCTION: Demonstration and interactive parts
 main :: IO ()
 main = do
-    putStrLn "=== Chapter 12: Haskell Programs and Modules ==="
-    putStrLn "Running HC12T1: Welcome Message"
-    main1
-    putStrLn "\nRunning HC12T2: Add Two Numbers"
-    main2
-    putStrLn "\nRunning HC12T3: Factorial Function"
-    main3
-    putStrLn "\nRunning HC12T4: First 10 Fibonacci Numbers"
-    main4
-    putStrLn "\nRunning HC12T5: Palindrome Checker"
-    main5
-    putStrLn "\nRunning HC12T6: Sort a List of Integers"
-    main6
-    putStrLn "\nRunning HC12T7: Calculate Circle Area"
-    main7
-    putStrLn "\nRunning HC12T8: Merge Two Sorted Lists"
-    main8
-    putStrLn "\nRunning HC12T9: Read and Print File Content"
-    main9
-    putStrLn "\nRunning HC12T10: Mathematical Operations Module"
-    main10
+    putStrLn "----- HC12T1: Welcome Message -----"
+    printWelcome
+
+    putStrLn "\n----- HC12T2: Add Two Numbers -----"
+    putStrLn $ "addTwoNumbers 10 15 = " ++ show (addTwoNumbers 10 15)
+
+    putStrLn "\n----- HC12T3: Factorial Function -----"
+    putStrLn $ "factorial 5 = " ++ show (factorial 5)
+
+    putStrLn "\n----- HC12T4: First 10 Fibonacci Numbers -----"
+    putStrLn $ show firstTenFibonacci
+
+    putStrLn "\n----- HC12T5: Palindrome Checker (user input) -----"
+    putStrLn "Enter a string to check for palindrome (example: Madam):"
+    hFlush stdout
+    palInput <- getLine
+    putStrLn $ "Is \"" ++ palInput ++ "\" a palindrome? " ++ show (isPalindrome palInput)
+
+    putStrLn "\n----- HC12T6: Sort a List of Integers -----"
+    putStrLn "Sorting example list [5,2,8,1,3]:"
+    putStrLn $ show (sortList [5,2,8,1,3])
+
+    putStrLn "\n----- HC12T7: Circle Area -----"
+    putStrLn $ "Area for radius 5 = " ++ show (calculateCircleArea 5)
+
+    putStrLn "\n----- HC12T8: Merge Two Sorted Lists -----"
+    putStrLn $ "mergeLists [1,3,5] [2,4,6] = " ++ show (mergeLists [1,3,5] [2,4,6])
+
+    putStrLn "\n----- HC12T9: Read and Print File Content -----"
+    putStrLn "Enter file name to read (or press Enter to skip):"
+    hFlush stdout
+    fileName <- getLine
+    if null fileName
+      then putStrLn "Skipping file read."
+      else readAndPrintFile fileName
+
+    putStrLn "\n----- HC12T10: Using MathOperations Module -----"
+    putStrLn $ "MathOps.add 5 3 = " ++ show (MathOps.add 5 3)
+    putStrLn $ "MathOps.subtractNum 10 4 = " ++ show (MathOps.subtractNum 10 4)
+    putStrLn $ "MathOps.multiply 6 7 = " ++ show (MathOps.multiply 6 7)
+    putStrLn $ "MathOps.divide 20 4 = " ++ show (MathOps.divide 20 4)
+
+    putStrLn "\nAll tasks demonstrated. Program complete."
+
+
+
+-- By Hulisani Muravha
+-- HC12T10: Mathematical Operations Module
+
+module MathOperations (add, subtractNum, multiply, divide) where
+
+add :: Num a => a -> a -> a
+add x y = x + y
+
+subtractNum :: Num a => a -> a -> a
+subtractNum x y = x - y
+
+multiply :: Num a => a -> a -> a
+multiply x y = x * y
+
+divide :: Fractional a => a -> a -> a
+divide _ 0 = error "Division by zero"
+divide x y = x / y
+
+    
